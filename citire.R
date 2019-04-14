@@ -30,13 +30,33 @@ write_encrypt <- function (path, files) {
 }
 
 
-encrypt <- function (df) {
+clean <- function (df) {
   column_names <- names(df)
-  pos <- grep("x", tolower(column_names))
-  if (length(pos) > 0) df <- df[,-pos] # elimina coloane adaugate in plus
+  pos_new_col <- grep("(^x$|^x.)", tolower(column_names))
+  last_col <- as.integer(seq(from=ncol(df)-7, to = ncol(df), by = 1))
+  if (identical(pos_new_col, last_col)) df <- df[,-pos_new_col] # elimina coloane adaugate in plus
+  return (df)
+}
+
+keep_digits <- function (df) {
   column_names <- names(df)
-  
   cnp <- grep("cnp", tolower(column_names))
+  if (length(cnp) == 0) return (df)
+  cnp_colname <- column_names[cnp] 
+  for (i in cnp_colname) {
+    df[,cnp_colname] <- as.character(df[,cnp_colname])
+    dns <- paste0(cnp_colname, "_dns") # dns data nasterii sex
+    df[,dns] <- as.numeric(substr(df[,cnp_colname], start = 1, stop = 7))
+  }
+  return(df)
+}
+
+encrypt <- function (df) {
+  df <- clean(df)
+  df <- keep_digits(df)
+  cnp <- grep("cnp", tolower(column_names))
+  # o coloana cu primele 7 cifre din CNP
+  # criptarea
   return (df)
 }
 
@@ -52,7 +72,7 @@ files <- files[dbf]
 a = lapply(files, function(x) read.dbf(file=x)) # citire toate fisierele dbf
 
 # citirea datelor: probleme! adauga 8 campuri in plus goale
-x1 <- read.dbf("cs_3B01.dbf")
+x1 <- read.dbf("cs_1B01.dbf")
 x2 <- read.dbf("dc_3B01.dbf")
 x3 <- read.dbf("dv_3B01.dbf")
 x4 <- read.dbf("nm_3B01.dbf")
