@@ -44,6 +44,10 @@ move "%%~ni.rar" "%dirC%"
 echo completed uncompressing "%%i" and moved archives or archive to "%dirC%"
 
 )
+
+set path="C:\Program Files\R\R-3.3.2\bin\";%path%
+Rscript D:/ANA_MARIA/demografie/testare_citire_R/encrypt.R
+
 goto eof
 
 :eof
