@@ -5,30 +5,6 @@ library(digest)  # criptare
 new_path <- "D:/ANA_MARIA/demografie/testare_citire_R/new"
 setwd(new_path)
 
-# parcurg toate folderele din folderul new
-# citesc toate fisierele dbf din subfolderele folderului new
-folders <- dir()
-for (i in folders) {
-  path <- paste0(getwd(),"/", i)
-  setwd(path)
-  files <- list.files()
-  write_encrypt(path, files)
-  setwd(new_path)
-  path <- c()
-}
-
-write_encrypt <- function (path, files) {
-  dbf <- grep(".dbf", files)
-  files <- files[dbf]
-  dbf_list <- lapply(files, function(x) read.dbf(file=x))
-  # transformare in data frame
-  for (i in seq(dbf_list)) assign(files[i], dbf_list[[i]])
-  # functie de cryptare + functie de curatare pentru fiecare dbf
-  
-  # scriere din dataframe in dbf
-  for (i in files) write.dbf(dataframe = get(files[i]), file = paste0(path, "/", files[i]))
-}
-
 
 clean <- function (df) {
   column_names <- names(df)
@@ -44,22 +20,60 @@ keep_digits <- function (df) {
   if (length(cnp) == 0) return (df)
   cnp_colname <- column_names[cnp] 
   for (i in cnp_colname) {
-    df[,cnp_colname] <- as.character(df[,cnp_colname])
-    dns <- paste0(cnp_colname, "_dns") # dns data nasterii sex
-    df[,dns] <- as.numeric(substr(df[,cnp_colname], start = 1, stop = 7))
+    df[,i] <- as.character(df[,i])
+    dns <- paste0(i, "_dns") # dns data nasterii sex
+    df[,dns] <- as.integer(substr(df[,i], start = 1, stop = 7))
   }
   return(df)
 }
 
+
+digest_if <- function (x) {
+  if (!is.na(x) && nchar(x) == 13) {
+    crypt <- toupper(digest(x, algo = "sha1", serialize=FALSE))
+    return (crypt)
+  }
+  return (x)
+}
+
+
 encrypt <- function (df) {
   df <- clean(df)
+  if (nrow(df) == 0) return (df) 
   df <- keep_digits(df)
+  column_names <- names(df)
+  column_names <- column_names[-grep("dns", tolower(column_names))]
   cnp <- grep("cnp", tolower(column_names))
-  # o coloana cu primele 7 cifre din CNP
-  # criptarea
+  cnp_colname <- column_names[cnp] 
+  for (i in cnp_colname) {
+    df[,i] <- unlist(lapply(df[,i], digest_if))
+  }
   return (df)
 }
 
+
+write_encrypt <- function (path, files) {
+  dbf <- grep(".dbf", files)
+  files <- files[dbf]
+  dbf_list <- lapply(files, function(x) read.dbf(file=x))
+  for (i in seq(dbf_list)) assign(files[i], dbf_list[[i]]) # transformare in data frame
+  for (i in files) assign(i, encrypt(get(i)))  # functie de cryptare + functie de curatare pentru fiecare dbf
+  for (i in files) write.dbf(dataframe = get(i), file = paste0(path, "/", i))  # scriere din dataframe in dbf
+  return (NULL)
+}
+
+
+# parcurg toate folderele din folderul new
+# citesc toate fisierele dbf din subfolderele folderului new
+folders <- dir()
+for (i in folders) {
+  path <- paste0(getwd(),"/", i)
+  setwd(path)
+  files <- list.files()
+  write_encrypt(path, files)
+  setwd(new_path)
+  path <- c()
+}
 
 
 #testare =================
@@ -72,7 +86,7 @@ files <- files[dbf]
 a = lapply(files, function(x) read.dbf(file=x)) # citire toate fisierele dbf
 
 # citirea datelor: probleme! adauga 8 campuri in plus goale
-x1 <- read.dbf("cs_1B01.dbf")
+x1 <- read.dbf("cs_3B01.dbf")
 x2 <- read.dbf("dc_3B01.dbf")
 x3 <- read.dbf("dv_3B01.dbf")
 x4 <- read.dbf("nm_3B01.dbf")
@@ -110,3 +124,9 @@ write.dbf(x, "x.dbf")
 # criptarea
 c1 <- toupper(digest("1740714411519", algo = "sha1", serialize=FALSE))
 identical(c1, "F9B2247F88352BCAFFAF66C91295B824C5FA6C76")
+digest(kd$CNP_F[1:nrow(kd)], algo = "sha1", serialize=FALSE)
+
+
+lapply(kd$CNP_M, dg)
+column_names <- names(x1)
+column_names <- column_names[,-grep("dns", tolower(column_names))]
