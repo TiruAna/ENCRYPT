@@ -14,15 +14,36 @@ clean <- function (df) {
   return (df)
 }
 
+year2to4 <- function (x) {
+  y <- c()
+  
+}
+
+# SEXCRP, ANCRP, LUNACRP, ZICRP
 keep_digits <- function (df) {
   column_names <- names(df)
   cnp <- grep("cnp", tolower(column_names))
   if (length(cnp) == 0) return (df)
-  cnp_colname <- column_names[cnp] 
+  cnp_colname <- column_names[cnp]
+  sexcrp <- "SEXCRP"
+  ancrp <- "ANCRP"
+  lunacrp <- "LUNACRP"
+  zicrp <- "ZICRP"
+  
   for (i in cnp_colname) {
     df[,i] <- as.character(df[,i])
-    dns <- paste0(i, "_dns") # dns data nasterii sex
-    df[,dns] <- as.integer(substr(df[,i], start = 1, stop = 7))
+    if (length(cnp_colname) > 1) {
+      F_M <- substr(i, nchar(i)-1, nchar(i))
+      sexcrp <- paste0(sexcrp, F_M)
+      ancrp <- paste0(ancrp, F_M)
+      lunacrp <- paste0(lunacrp, F_M)
+      zicrp <- paste0(zicrp, F_M)
+    }
+    df[,sexcrp] <- as.integer(substr(df[,i], start = 1, stop = 1))
+    
+    df[,ancrp] <- substr(df[,i], start = 2, stop = 3)
+    df[,lunacrp] <- as.integer(substr(df[,i], start = 4, stop = 5))
+    df[,zicrp] <- as.integer(substr(df[,i], start = 6, stop = 7))
   }
   return(df)
 }
