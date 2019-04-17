@@ -14,9 +14,23 @@ clean <- function (df) {
   return (df)
 }
 
-year2to4 <- function (x) {
-  y <- c()
-  
+year2to4 <- function (cnp) {
+  year <- c()
+  for (i in 1:length(cnp)) {
+    if (is.na(cnp[i]) | cnp[i] == 0 | nchar(cnp[i]) != 13) {
+      year <- c(year, cnp[i])
+      next
+    }
+    first_digit <- as.integer(substr(cnp[i], start = 1, stop = 1))
+    if (first_digit == 1 | first_digit == 2) {
+      y <- paste0("19", substr(cnp[i], start = 2, stop = 3))
+    } else {
+      y <- paste0("20", substr(cnp[i], start = 2, stop = 3))
+    }
+    year <- c(year, y)
+  }
+  year <- as.integer(year)
+  return (year)
 }
 
 # SEXCRP, ANCRP, LUNACRP, ZICRP
@@ -40,8 +54,7 @@ keep_digits <- function (df) {
       zicrp <- paste0(zicrp, F_M)
     }
     df[,sexcrp] <- as.integer(substr(df[,i], start = 1, stop = 1))
-    
-    df[,ancrp] <- substr(df[,i], start = 2, stop = 3)
+    df[,ancrp] <- year2to4(df[,i])
     df[,lunacrp] <- as.integer(substr(df[,i], start = 4, stop = 5))
     df[,zicrp] <- as.integer(substr(df[,i], start = 6, stop = 7))
   }
