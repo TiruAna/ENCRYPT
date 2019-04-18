@@ -18,7 +18,7 @@ year2to4 <- function (cnp) {
   year <- c()
   for (i in 1:length(cnp)) {
     if (is.na(cnp[i]) | cnp[i] == 0 | nchar(cnp[i]) != 13) {
-      year <- c(year, cnp[i])
+      year <- c(year, NA)
       next
     }
     first_digit <- as.integer(substr(cnp[i], start = 1, stop = 1))
@@ -34,7 +34,7 @@ year2to4 <- function (cnp) {
 }
 
 # SEXCRP, ANCRP, LUNACRP, ZICRP
-keep_digits <- function (df) {
+add_columns <- function (df) {
   column_names <- names(df)
   cnp <- grep("cnp", tolower(column_names))
   if (length(cnp) == 0) return (df)
@@ -46,12 +46,12 @@ keep_digits <- function (df) {
   
   for (i in cnp_colname) {
     df[,i] <- as.character(df[,i])
-    if (length(cnp_colname) > 1) {
+    if (length(cnp_colname) > 1) { # daca exista mai multe coloane cnp
       F_M <- substr(i, nchar(i)-1, nchar(i))
-      sexcrp <- paste0(sexcrp, F_M)
-      ancrp <- paste0(ancrp, F_M)
-      lunacrp <- paste0(lunacrp, F_M)
-      zicrp <- paste0(zicrp, F_M)
+      sexcrp <- paste0("SEXCRP", F_M)
+      ancrp <- paste0("ANCRP", F_M)
+      lunacrp <- paste0("LUNACRP", F_M)
+      zicrp <- paste0("ZICRP", F_M)
     }
     df[,sexcrp] <- as.integer(substr(df[,i], start = 1, stop = 1))
     df[,ancrp] <- year2to4(df[,i])
@@ -74,7 +74,7 @@ digest_if <- function (x) {
 encrypt <- function (df) {
   df <- clean(df)
   if (nrow(df) == 0) return (df) 
-  df <- keep_digits(df)
+  df <- add_columns(df)
   column_names <- names(df)
   column_names <- column_names[-grep("dns", tolower(column_names))]
   cnp <- grep("cnp", tolower(column_names))
