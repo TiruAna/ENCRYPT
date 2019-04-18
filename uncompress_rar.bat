@@ -48,6 +48,18 @@ echo completed uncompressing "%%i" and moved archives or archive to "%dirC%"
 set path="C:\Program Files\R\R-3.3.2\bin\";%path%
 Rscript D:/ANA_MARIA/demografie/testare_citire_R/encrypt.R
 
+
+cd %dirN%
+
+set zip="C:\Program Files\WinRAR\rar.exe" a -r -u -df
+
+dir /b /o:n /ad > .\folders.txt
+
+for /F "tokens=*" %%A in (.\folders.txt) do if not exist ".\%%~nA.rar" %zip% ".\%%~nA.rar" "%%A"
+ 
+del "*.txt"
+
+
 goto eof
 
 :eof
