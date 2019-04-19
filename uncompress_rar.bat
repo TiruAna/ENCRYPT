@@ -51,7 +51,7 @@ Rscript D:/ANA_MARIA/demografie/testare_citire_R/encrypt.R
 
 cd %dirN%
 
-set zip="C:\Program Files\WinRAR\rar.exe" a -r -u -df
+set zip="C:\Program Files\WinRAR\rar.exe" a -r -u -df -ep
 
 dir /b /o:n /ad > .\folders.txt
 
