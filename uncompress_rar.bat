@@ -2,28 +2,25 @@
 
 setlocal
 
-REM Specify the folder to uncompress below:
-REM -------------------------------- Compressed file folder_----------------------------
-set dirA=D:\ANA_MARIA\demografie\testare_citire_R
-REM ------------------------------------------------------------------------------------
+REM Calea unde se gasesc arhivele .rar, scriptul .bat si scriptul.R
+set dirA=C:\Users\Glugluta\proiecte\dem
 
-REM change to directory
 cd %dirA%
 
-REM Specify the extracted files folder below:
-REM -------------------------------- Folder to extract to-------------------------------
-set dirE=D:\ANA_MARIA\demografie\testare_citire_R
-REM ------------------------------------------------------------------------------------
+echo %DATE%
+echo %TIME%
+
+SET hr=%time:~0,2%
+
+SET TODAY=%date:~7,2%-%date:~4,2%-%date:~10,4%_%hr%-%time:~3,2%-%time:~6,2%
 
 
-REM Specify where to move processed archives below. This folder must exist:
-REM -------------------------------- Processed folder-----------------------------------
-md old
-set dirC=%dirA%\old
-REM ------------------------------------------------------------------------------------
+md dem_cnp_necriptat_%TODAY%
+set dirC=%dirA%\dem_cnp_necriptat_%TODAY%
 
-md new
-set dirN=%dirA%\new
+
+md dem_cnp_criptat_%TODAY%
+set dirN=%dirA%\dem_cnp_criptat_%TODAY%
 
 
 REM Path to WinRAR executable in Program Files
@@ -45,8 +42,8 @@ echo completed uncompressing "%%i" and moved archives or archive to "%dirC%"
 
 )
 
-set path="C:\Program Files\R\R-3.3.2\bin\";%path%
-Rscript D:/ANA_MARIA/demografie/testare_citire_R/encrypt.R
+set path="C:\Program Files\R\R-3.5.1\bin\";%path%
+Rscript C:/Users/Glugluta/proiecte/dem/encrypt.R
 
 
 cd %dirN%
