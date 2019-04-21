@@ -1,10 +1,29 @@
 library(foreign) # manipulare dbf
 library(digest)  # criptare
+library(lubridate)
+
+files <- list.files()
+pos <- grep(pattern = "dem_cnp_criptat_", x = files)
+files <- files[pos]
+min <- 1000000
+index <- -1
+for (i in 1:length(files)) {
+  date_time <- gsub(pattern = "dem_cnp_criptat_", replacement = "", x = files[i])
+  time <- strsplit(date_time, split = "_")[[1]][2]
+  time <- gsub(pattern = "-", replacement = ":", x = time)
+  sec <- period_to_seconds(hms(time))
+  systime <- period_to_seconds(hms(format(Sys.time(), "%H:%M:%S")))
+  dif <- systime-sec
+  if (dif < min) {
+    min <- dif
+    index <- i
+  }
+}
 
 # setez calea new pentru ca aici fac modificarile
-new_path <- "D:/ANA_MARIA/demografie/testare_citire_R/new"
+path <- "C:/Users/Glugluta/proiecte/dem/"
+new_path <- paste0(path, files[index])
 setwd(new_path)
-
 
 clean <- function (df) {
   column_names <- names(df)
@@ -104,7 +123,7 @@ encrypt <- function (df) {
 write_encrypt <- function (path, files) {
   dbf <- grep(".dbf", files)
   files <- files[dbf]
-  dbf_list <- lapply(files, function(x) read.dbf(file=x))
+  dbf_list <- lapply(files, function(x) suppressMessages(read.dbf(file=x)))
   for (i in seq(dbf_list)) assign(files[i], dbf_list[[i]]) # transformare in data frame
   for (i in files) assign(i, encrypt(get(i)))  # functie de cryptare + functie de curatare pentru fiecare dbf
   for (i in files) write.dbf(dataframe = get(i), file = paste0(path, "/", i))  # scriere din dataframe in dbf
