@@ -11,6 +11,8 @@ REM ----------------------------------------------------------------------------
 
 cd %dirA%
 
+if not exist *.rar goto exit
+
 SET hr=%time:~0,2%
 IF %hr% lss 10 SET hr=0%hr:~1,1%
 
