@@ -1,11 +1,12 @@
 # Seteaza calea =========================================================================================================
 
-path <- "D:/ANA_MARIA/demografie/test/"
+path <- "D:/ANA_MARIA/Demografie/"
 
 # =======================================================================================================================
 
-library(foreign) # manipulare dbf
-library(digest)  # criptare
+
+library(foreign) 
+library(digest) 
 library(lubridate)
 
 files <- list.files()
